@@ -49,26 +49,19 @@ export default function LandingPage() {
         stagger: 0.06,
         delay: 1.4,
       });
-
-      // floating whole section
-      gsap.to(".landing-container", {
-        y: 10,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
     });
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section className="landing-container relative w-full h-screen bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 flex items-center justify-center px-6 overflow-hidden">
-      {/* background bubbles */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full opacity-10 animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-32 h-32 bg-white rounded-full opacity-5 animate-pulse" />
-
+    <section className="landing-container relative w-full h-screen bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center px-6 overflow-hidden">
+      {/* background bubbles at edges */}
+      <div className="absolute top-10 left-10 w-12 h-12 bg-white rounded-full opacity-5 animate-pulse" />
+      <div className="absolute top-16 right-12 w-16 h-16 bg-white rounded-full opacity-4 animate-pulse" style={{ animationDelay: '0.5s' }} />
+      <div className="absolute bottom-20 left-16 w-14 h-14 bg-white rounded-full opacity-3 animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute bottom-24 right-20 w-18 h-18 bg-white rounded-full opacity-3 animate-pulse" style={{ animationDelay: '1.5s' }} />
+      
       <div className="text-center max-w-3xl z-10">
         <h1
           ref={titleRef}

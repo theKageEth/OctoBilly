@@ -43,8 +43,8 @@ const faceImages = {
 };
 
 export default function OctopusProfile({
-  body = "blue-octopi",
-  face = "neutral3",
+  body,
+  face,
   
 }) {
   const bodyImage = bodyImages[body];
@@ -67,7 +67,7 @@ export default function OctopusProfile({
         <img
           src={faceImage.src}
           className="absolute inset-0 w-full h-full"
-          style={{ transform: "scale(0.6) translateY(-30px)" }}
+          style={{ transform: "scale(0.4) translateY(-30px)" }}
           alt="octopus face"
         />
       )}
