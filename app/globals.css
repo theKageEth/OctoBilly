@@ -52,3 +52,24 @@ body {
 .animate-gentle-bounce {
   animation: gentle-bounce 2s ease-in-out infinite;
 }
+
+@keyframes bubble {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-180vh) translateX(40px);
+    opacity: 0;
+  }
+}
+
+.animate-bubble {
+  animation: bubble 6s ease-in-out infinite;
+}

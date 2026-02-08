@@ -10,12 +10,35 @@ export default function LandingPage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // helper → split words
+      // Helper to split words while preserving HTML
       const splitWords = (el) => {
-        const words = el.innerText.split(" ");
-        el.innerHTML = words
-          .map((w) => `<span class="inline-block">${w}</span>`)
-          .join(" ");
+        if (!el) return [];
+        
+        // Get all child nodes (text and elements)
+        const childNodes = Array.from(el.childNodes);
+        const words = [];
+        
+        // Process each node
+        childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            // Split text nodes by spaces
+            const textWords = node.textContent.split(" ").filter(w => w.trim());
+            textWords.forEach(word => {
+              words.push(`<span class="inline-block">${word}</span>`);
+            });
+          } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Preserve element nodes (like our colored spans)
+            const nodeWords = node.textContent.split(" ").filter(w => w.trim());
+            nodeWords.forEach(word => {
+              const clone = node.cloneNode(false);
+              clone.textContent = word;
+              clone.classList.add('inline-block');
+              words.push(clone.outerHTML);
+            });
+          }
+        });
+        
+        el.innerHTML = words.join(" ");
         return el.querySelectorAll("span");
       };
 
@@ -56,6 +79,48 @@ export default function LandingPage() {
 
   return (
     <section className="landing-container relative w-full h-screen bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center px-6 overflow-hidden">
+      {/* Animated Bubbles */}
+      <style jsx>{`
+        @keyframes float-up {
+          0% {
+            transform: translateY(100vh) scale(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) scale(1);
+            opacity: 0;
+          }
+        }
+        .bubble {
+          position: absolute;
+          bottom: -100px;
+          background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+          border-radius: 50%;
+          animation: float-up linear infinite;
+          pointer-events: none;
+          z-index: 5;
+        }
+      `}</style>
+      
+      <div className="bubble" style={{ left: '10%', width: '20px', height: '20px', animationDuration: '8s', animationDelay: '0s' }}></div>
+      <div className="bubble" style={{ left: '20%', width: '15px', height: '15px', animationDuration: '10s', animationDelay: '2s' }}></div>
+      <div className="bubble" style={{ left: '30%', width: '25px', height: '25px', animationDuration: '7s', animationDelay: '4s' }}></div>
+      <div className="bubble" style={{ left: '40%', width: '18px', height: '18px', animationDuration: '9s', animationDelay: '1s' }}></div>
+      <div className="bubble" style={{ left: '50%', width: '22px', height: '22px', animationDuration: '11s', animationDelay: '3s' }}></div>
+      <div className="bubble" style={{ left: '60%', width: '16px', height: '16px', animationDuration: '8s', animationDelay: '5s' }}></div>
+      <div className="bubble" style={{ left: '70%', width: '20px', height: '20px', animationDuration: '10s', animationDelay: '2s' }}></div>
+      <div className="bubble" style={{ left: '80%', width: '24px', height: '24px', animationDuration: '9s', animationDelay: '0s' }}></div>
+      <div className="bubble" style={{ left: '90%', width: '18px', height: '18px', animationDuration: '7s', animationDelay: '4s' }}></div>
+      <div className="bubble" style={{ left: '15%', width: '14px', height: '14px', animationDuration: '12s', animationDelay: '6s' }}></div>
+      <div className="bubble" style={{ left: '75%', width: '21px', height: '21px', animationDuration: '8s', animationDelay: '3s' }}></div>
+      <div className="bubble" style={{ left: '35%', width: '17px', height: '17px', animationDuration: '10s', animationDelay: '1s' }}></div>
+      
       {/* background bubbles at edges */}
       <div className="absolute top-10 left-10 w-12 h-12 bg-white rounded-full opacity-5 animate-pulse" />
       <div className="absolute top-16 right-12 w-16 h-16 bg-white rounded-full opacity-4 animate-pulse" style={{ animationDelay: '0.5s' }} />
@@ -67,19 +132,19 @@ export default function LandingPage() {
           ref={titleRef}
           className="text-7xl font-black text-white mb-6 leading-tight"
         >
-          A Reef Worth Saving
+          A <span className="text-yellow-200">Reef</span> Worth <span className="text-yellow-200">Saving</span>
         </h1>
 
         <p
           ref={subtitleRef}
-          className="text-2xl text-white/95 mb-8 font-bold"
+          className="text-3xl text-white/95 mb-8 font-bold"
         >
-          Follow Billy’s journey
+          Follow <span className="text-pink-500 font-bold">Billy's</span> journey
         </p>
 
         <p
           ref={descriptionRef}
-          className="text-lg text-white/80 leading-relaxed mb-12"
+          className="text-xl text-white/80 leading-relaxed mb-12"
         >
           Pollution spreads. The ocean grows quiet. The reef needs its community.
         </p>

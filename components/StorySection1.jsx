@@ -26,6 +26,23 @@ export default function StorySection1() {
       return el.querySelectorAll("span");
     };
 
+    // special split for title with colored "Pollution"
+    const splitTitleWithColors = (el) => {
+      const text = "The Reality of Ocean Pollution";
+      const words = text.split(" ");
+      
+      el.innerHTML = words.map((word, i) => {
+        if (word === "Pollution") {
+          return `<span class="inline-block">${word.split('').map((letter, j) => 
+            `<span class="inline-block text-cyan-400">${letter}</span>`
+          ).join('')}</span>`;
+        }
+        return `<span class="inline-block">${word}</span>`;
+      }).join(" ");
+      
+      return el.querySelectorAll("span.inline-block");
+    };
+
     const tl = gsap.timeline({
       defaults: { ease: "power2.out" },
       scrollTrigger: {
@@ -36,7 +53,7 @@ export default function StorySection1() {
     });
 
     // title with split word effect (like landing page)
-    tl.from(splitWords(titleRef.current), {
+    tl.from(splitTitleWithColors(titleRef.current), {
       y: -100,
       opacity: 0,
       rotation: () => gsap.utils.random(-60, 60),
@@ -96,6 +113,48 @@ export default function StorySection1() {
       ref={containerRef}
       className="relative w-full h-screen bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 flex flex-col items-center justify-center overflow-hidden px-6"
     >
+      {/* Animated Bubbles */}
+      <style jsx>{`
+        @keyframes float-up {
+          0% {
+            transform: translateY(100vh) scale(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) scale(1);
+            opacity: 0;
+          }
+        }
+        .bubble {
+          position: absolute;
+          bottom: -100px;
+          background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+          border-radius: 50%;
+          animation: float-up linear infinite;
+          pointer-events: none;
+          z-index: 5;
+        }
+      `}</style>
+      
+      <div className="bubble" style={{ left: '10%', width: '20px', height: '20px', animationDuration: '8s', animationDelay: '0s' }}></div>
+      <div className="bubble" style={{ left: '20%', width: '15px', height: '15px', animationDuration: '10s', animationDelay: '2s' }}></div>
+      <div className="bubble" style={{ left: '30%', width: '25px', height: '25px', animationDuration: '7s', animationDelay: '4s' }}></div>
+      <div className="bubble" style={{ left: '40%', width: '18px', height: '18px', animationDuration: '9s', animationDelay: '1s' }}></div>
+      <div className="bubble" style={{ left: '50%', width: '22px', height: '22px', animationDuration: '11s', animationDelay: '3s' }}></div>
+      <div className="bubble" style={{ left: '60%', width: '16px', height: '16px', animationDuration: '8s', animationDelay: '5s' }}></div>
+      <div className="bubble" style={{ left: '70%', width: '20px', height: '20px', animationDuration: '10s', animationDelay: '2s' }}></div>
+      <div className="bubble" style={{ left: '80%', width: '24px', height: '24px', animationDuration: '9s', animationDelay: '0s' }}></div>
+      <div className="bubble" style={{ left: '90%', width: '18px', height: '18px', animationDuration: '7s', animationDelay: '4s' }}></div>
+      <div className="bubble" style={{ left: '15%', width: '14px', height: '14px', animationDuration: '12s', animationDelay: '6s' }}></div>
+      <div className="bubble" style={{ left: '75%', width: '21px', height: '21px', animationDuration: '8s', animationDelay: '3s' }}></div>
+      <div className="bubble" style={{ left: '35%', width: '17px', height: '17px', animationDuration: '10s', animationDelay: '1s' }}></div>
+      
       {/* background bubbles at edges */}
       <div className="absolute top-10 left-10 w-12 h-12 bg-white rounded-full opacity-5 animate-pulse" />
       <div className="absolute top-16 right-12 w-16 h-16 bg-white rounded-full opacity-4 animate-pulse" style={{ animationDelay: '0.5s' }} />

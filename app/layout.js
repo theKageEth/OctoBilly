@@ -12,15 +12,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "BlueBilly - Ocean Sustainability Story",
+  title: "OctoBilly - Ocean Sustainability Story",
   description: "An interactive journey through ocean conservation and sustainability with adorable octopus characters",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      <body 
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-screen`}
       >
         {children}
       </body>

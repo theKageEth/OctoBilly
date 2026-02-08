@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Blue Billy - Ocean Cleanup Adventure
+
+## Aston Hackathon 11 Submission
+
+This project is our official submission for **Aston Hackathon 11** competition.
+
+### Theme: Community & Saving the Planet
+
+Blue Billy is an interactive multiplayer game designed to **raise awareness about ocean pollution** in a fun and engaging way. Players control adorable octopus characters as they work together to clean up plastic bottles from the ocean floor.
+
+### Why Blue Billy?
+
+- **Educational**: Learn about the impact of plastic pollution on marine life
+- **Fun**: Multiplayer gameplay with cute customizable octopus characters
+- **Engaging**: Collect bottles, compete on leaderboards, and save the ocean together
+- **Awareness**: Visual representation of pollution (green bubbles) transforming to clean water (white bubbles) as you collect more trash
+
+### Features
+
+- Multiplayer support via PlayroomKit (join with QR code or room code)
+- Character customization (8 different octopus colors, multiple face expressions)
+- Real-time leaderboard
+- Health system and survival mechanics
+- Beautiful underwater 3D environment
+- Mobile-friendly with joystick controls
+- Educational story about Billy the Octopus and ocean conservation
+
+### The Story
+
+Follow Billy, a curious little octopus who discovers the devastating effects of plastic pollution in his ocean home. Join Billy and friends in the mission to clean up the seas and restore the underwater world to its natural beauty.
+
+---
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Then run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to play!
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js** - React framework
+- **React Three Fiber** - 3D graphics
+- **PlayroomKit** - Multiplayer functionality
+- **@react-three/drei** - 3D helpers and components
 
-## Learn More
+## Team
 
-To learn more about Next.js, take a look at the following resources:
+Submitted for Aston Hackathon 11 - Community & Planet Theme
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Together we can make a difference, one bottle at a time!*
