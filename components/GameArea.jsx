@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { myPlayer } from "playroomkit";
 
 export const GameArea = ({ players = [], onCollectBottle }) => {
   return (
@@ -251,7 +252,8 @@ export const GameArea = ({ players = [], onCollectBottle }) => {
 // Collectible bottles component
 const Bottles = ({ players = [], onCollectBottle }) => {
   const nextIdRef = useRef(15);
-  
+  const lastCheckRef = useRef(0);
+
   // Generate random bottle position - spread out across play area
   const generateRandomBottle = () => {
     const id = nextIdRef.current++;
@@ -304,33 +306,34 @@ const Bottles = ({ players = [], onCollectBottle }) => {
     '#f0d0e0', '#d0e0f0', '#f0e0d0'
   ];
 
-  // Check for collisions with players each frame
+  // Optimized collision: only check for local player, throttle to every 100ms
   useFrame(() => {
-    if (!players || players.length === 0) return;
-    
-    bottles.forEach((bottle) => {
-      players.forEach((player) => {
-        const playerPos = player.state.getState("pos");
-        const playerHp = player.state.getState("hp") ?? 100;
-        if (!playerPos || playerHp <= 0) return; // Dead players can't collect
-        
-        // Calculate distance (only x and z, ignore y)
-        const dx = playerPos.x - bottle.pos[0];
-        const dz = playerPos.z - bottle.pos[2];
-        const distance = Math.sqrt(dx * dx + dz * dz);
-        
-        // Collection radius (bigger for bigger bottles)
-        if (distance < 1.5) {
-          // Collect the bottle
-          setBottles(prev => prev.filter(b => b.id !== bottle.id));
-          
-          // Award points
-          if (onCollectBottle) {
-            onCollectBottle(player.state, 10);
-          }
-        }
-      });
-    });
+    const now = performance.now();
+    if (now - lastCheckRef.current < 100) return;
+    lastCheckRef.current = now;
+
+    const localPlayerId = myPlayer()?.id;
+    if (!localPlayerId) return;
+    const localPlayer = players.find(p => p.state.id === localPlayerId);
+    if (!localPlayer) return;
+    const playerPos = localPlayer.state.getState("pos");
+    const playerHp = localPlayer.state.getState("hp") ?? 100;
+    if (!playerPos || playerHp <= 0) return;
+
+    // Find all bottles within collection radius
+    const collectedIds = bottles.filter(bottle => {
+      const dx = playerPos.x - bottle.pos[0];
+      const dz = playerPos.z - bottle.pos[2];
+      const distance = Math.sqrt(dx * dx + dz * dz);
+      return distance < 1.5;
+    }).map(b => b.id);
+
+    if (collectedIds.length > 0) {
+      setBottles(prev => prev.filter(b => !collectedIds.includes(b.id)));
+      if (onCollectBottle) {
+        collectedIds.forEach(() => onCollectBottle(localPlayer.state, 10));
+      }
+    }
   });
 
   return (

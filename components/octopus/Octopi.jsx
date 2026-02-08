@@ -213,7 +213,16 @@ export function Octopi(props) {
               sprite
               pointerEvents="none"
             >
-              <div style={{ width: '500px', height: '500px', position: 'relative', pointerEvents: 'none' }}>
+              <div
+                style={{
+                  width: 'min(120px, 24vw)',
+                  height: 'min(120px, 24vw)',
+                  maxWidth: '500px',
+                  maxHeight: '500px',
+                  position: 'relative',
+                  pointerEvents: 'none',
+                }}
+              >
                 <Image 
                   src={faceImages[currentFace]} 
                   alt="face" 
