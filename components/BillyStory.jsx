@@ -30,6 +30,22 @@ export default function BillyStory() {
   const [billyRotation, setBillyRotation] = useState(0);
   const [billyRotation3D, setBillyRotation3D] = useState(0);
   const [faceIndex, setFaceIndex] = useState(0);
+  const [screenWidth, setScreenWidth] = useState(1200);
+  
+  // Track screen width for responsive Billy movement
+  useEffect(() => {
+    const updateWidth = () => setScreenWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+  
+  // Get responsive x multiplier based on screen width
+  const getXMultiplier = () => {
+    if (screenWidth < 640) return 0.15; // Small screens - minimal x movement
+    if (screenWidth < 1024) return 0.35; // Medium screens - reduced x movement
+    return 1; // Large screens - full movement
+  };
   
   // Cycle through multiple faces in Meet Billy section
   useEffect(() => {
@@ -102,6 +118,8 @@ export default function BillyStory() {
   useEffect(() => {
     if (!billyRef.current) return;
     
+    const xMult = getXMultiplier();
+    
     if (currentSection === 'meet') {
       // Meet Billy - center
       gsap.to({}, {
@@ -113,16 +131,16 @@ export default function BillyStory() {
         }
       });
     } else if (currentSection === 'help') {
-      // Help Billy - move to left
+      // Help Billy - move to left (reduced on small screens)
       gsap.to({}, {
         duration: 1.5,
         onUpdate: function() {
           const progress = this.progress();
-          setBillyPosition({ x: -400 * progress, y: -200 * progress });
+          setBillyPosition({ x: -400 * xMult * progress, y: -200 * progress });
         }
       });
     } else if (currentSection === 'action') {
-      // Action - move to top-left and rotate smoothly
+      // Action - move to top-left and rotate smoothly (reduced x on small screens)
       gsap.to({}, {
         duration: 2,
         ease: "power2.inOut",
@@ -130,14 +148,14 @@ export default function BillyStory() {
           const progress = this.progress();
           // Smoothly animate from (-400, -200) to (-600, -400)
           setBillyPosition({ 
-            x: -400 + (-200 * progress), 
+            x: (-400 + (-200 * progress)) * xMult, 
             y: -200 + (-200 * progress) 
           });
           setBillyRotation3D(progress * Math.PI * 2); // Full rotation in radians
         }
       });
     }
-  }, [currentSection]);
+  }, [currentSection, screenWidth]);
   
   const section1Ref = useRef(null);
   const section2Ref = useRef(null);

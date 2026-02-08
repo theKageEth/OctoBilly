@@ -58,6 +58,7 @@ export default function GamePage() {
     body: 'blue-octopi',
     face: 'neutral'
   });
+  const [leaderboardExpanded, setLeaderboardExpanded] = useState(false);
 
   const players = usePlayersList(true);
 
@@ -455,80 +456,133 @@ export default function GamePage() {
         </Canvas>
         
         {/* Leaderboard Overlay */}
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '16px',
-          padding: '16px',
-          minWidth: '200px',
-          border: '2px solid rgba(255, 255, 255, 0.2)',
-          zIndex: 100
-        }}>
+        <div 
+          onClick={() => setLeaderboardExpanded(!leaderboardExpanded)}
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            background: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '12px',
+            padding: '10px 12px',
+            minWidth: leaderboardExpanded ? '180px' : '140px',
+            maxWidth: '200px',
+            border: '2px solid rgba(255, 255, 255, 0.2)',
+            zIndex: 100,
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+          }}>
           <h3 style={{
             color: 'white',
-            fontSize: '18px',
+            fontSize: '14px',
             fontWeight: 'bold',
             textAlign: 'center',
-            marginBottom: '12px',
+            marginBottom: '8px',
             borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-            paddingBottom: '8px'
+            paddingBottom: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
           }}>
             🏆 Leaderboard
+            <span style={{ 
+              fontSize: '10px', 
+              opacity: 0.7,
+              transform: leaderboardExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s'
+            }}>▼</span>
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {sortedPlayers.map((player, idx) => {
-              const score = player.getState('score') || 0;
-              const hp = player.getState('hp') ?? 100;
-              const name = player.getState('name') || `Player ${idx + 1}`;
-              const isMe = player.id === myPlayer()?.id;
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '6px',
+            maxHeight: leaderboardExpanded ? '200px' : 'none',
+            overflowY: leaderboardExpanded ? 'auto' : 'visible'
+          }}>
+            {(() => {
+              // Show all players when expanded, otherwise show leader + current player
+              const myPlayerId = myPlayer()?.id;
+              const myPlayerIndex = sortedPlayers.findIndex(p => p.id === myPlayerId);
               
-              return (
-                <div
-                  key={player.id}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: '8px 12px',
-                    background: isMe ? 'rgba(59, 130, 246, 0.5)' : 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    border: isMe ? '2px solid #60a5fa' : 'none',
-                    gap: '4px'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: 'white', fontSize: '14px' }}>
-                      {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`} {name}
-                    </span>
-                    <span style={{
-                      color: '#4ade80',
-                      fontWeight: 'bold',
-                      fontSize: '14px'
+              let playersToShow = sortedPlayers;
+              if (!leaderboardExpanded) {
+                // Collapsed: show leader and current player only
+                const leader = sortedPlayers[0];
+                const currentPlayer = sortedPlayers.find(p => p.id === myPlayerId);
+                
+                if (leader && currentPlayer && leader.id !== currentPlayer.id) {
+                  playersToShow = [leader, currentPlayer];
+                } else if (leader) {
+                  playersToShow = [leader];
+                } else {
+                  playersToShow = [];
+                }
+              }
+              
+              return playersToShow.map((player) => {
+                const playerIdx = sortedPlayers.findIndex(p => p.id === player.id);
+                const score = player.getState('score') || 0;
+                const hp = player.getState('hp') ?? 100;
+                const name = player.getState('name') || `Player ${playerIdx + 1}`;
+                const isMe = player.id === myPlayerId;
+                
+                return (
+                  <div
+                    key={player.id}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      padding: '6px 8px',
+                      background: isMe ? 'rgba(59, 130, 246, 0.5)' : 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '6px',
+                      border: isMe ? '1px solid #60a5fa' : 'none',
+                      gap: '3px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'white', fontSize: '11px', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {playerIdx === 0 ? '🥇' : playerIdx === 1 ? '🥈' : playerIdx === 2 ? '🥉' : `${playerIdx + 1}.`} {name}
+                      </span>
+                      <span style={{
+                        color: '#4ade80',
+                        fontWeight: 'bold',
+                        fontSize: '11px'
+                      }}>
+                        {score}
+                      </span>
+                    </div>
+                    {/* HP Bar */}
+                    <div style={{ 
+                      width: '100%', 
+                      height: '4px', 
+                      background: '#333', 
+                      borderRadius: '2px',
+                      overflow: 'hidden'
                     }}>
-                      {score} pts
-                    </span>
+                      <div style={{
+                        width: `${hp}%`,
+                        height: '100%',
+                        background: hp > 50 ? '#4ade80' : hp > 25 ? '#fbbf24' : '#ef4444',
+                        transition: 'width 0.3s, background 0.3s'
+                      }} />
+                    </div>
                   </div>
-                  {/* HP Bar */}
-                  <div style={{ 
-                    width: '100%', 
-                    height: '6px', 
-                    background: '#333', 
-                    borderRadius: '3px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      width: `${hp}%`,
-                      height: '100%',
-                      background: hp > 50 ? '#4ade80' : hp > 25 ? '#fbbf24' : '#ef4444',
-                      transition: 'width 0.3s, background 0.3s'
-                    }} />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
+          {!leaderboardExpanded && sortedPlayers.length > 2 && (
+            <div style={{ 
+              textAlign: 'center', 
+              color: 'rgba(255,255,255,0.5)', 
+              fontSize: '10px', 
+              marginTop: '4px' 
+            }}>
+              +{sortedPlayers.length - 2} more
+            </div>
+          )}
         </div>
 
         {/* Game Over Overlay */}
