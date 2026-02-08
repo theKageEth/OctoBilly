@@ -283,18 +283,18 @@ const Bottles = ({ players = [], onCollectBottle }) => {
 
   const [bottles, setBottles] = useState(initialBottles);
 
-  // Spawn new bottles periodically
+  // Spawn new bottles periodically - reduced frequency and max count
   useEffect(() => {
     const spawnInterval = setInterval(() => {
-      // Spawn 2 bottles at a time, max 35 bottles
+      // Spawn 1 bottle at a time, max 25 bottles (reduced from 35)
       setBottles(prev => {
-        if (prev.length < 35) {
-          const newBottles = [generateRandomBottle(), generateRandomBottle()];
+        if (prev.length < 25) {
+          const newBottles = [generateRandomBottle()];
           return [...prev, ...newBottles];
         }
         return prev;
       });
-    }, 800); // Spawn every 0.8 seconds
+    }, 1200); // Spawn every 1.2 seconds (increased from 0.8s)
 
     return () => clearInterval(spawnInterval);
   }, []);
@@ -346,7 +346,7 @@ const Bottles = ({ players = [], onCollectBottle }) => {
           <group key={bottle.id} position={bottle.pos} rotation={[Math.PI / 2, 0, rotY]}>
             {/* Main bottle body - laying flat, BIGGER */}
             <mesh>
-              <cylinderGeometry args={[0.2, 0.2, 1.2, 12]} />
+              <cylinderGeometry args={[0.2, 0.2, 1.2, 8]} /> {/* Reduced segments from 12 to 8 */}
               <meshStandardMaterial 
                 color={colors[bottle.id % colors.length]} 
                 opacity={0.7} 

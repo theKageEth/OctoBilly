@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
 import { insertCoin, myPlayer, getRoomCode, usePlayersList } from 'playroomkit';
@@ -44,6 +44,9 @@ const bodyColors = {
   'teal-octopi': '#14b8a6'
 };
 
+const bodyOptions = ['blue-octopi', 'green-octopi', 'pink-octopi', 'orange-octopi', 'purple-octopi', 'yellow-octopi', 'red-octopi', 'teal-octopi'];
+const faceOptions = ['neutral', 'neutral2', 'neutral3', 'neutral4', 'neutral5', 'laugh', 'love', 'pout'];
+
 const CharacterPreviewScene = dynamic(() => import('@/components/CharacterPreviewScene'), {
   ssr: false,
 });
@@ -59,11 +62,29 @@ export default function GamePage() {
     face: 'neutral'
   });
   const [leaderboardExpanded, setLeaderboardExpanded] = useState(false);
+  const [lastLeaderboardUpdate, setLastLeaderboardUpdate] = useState(0);
 
   const players = usePlayersList(true);
 
-  const bodyOptions = ['blue-octopi', 'green-octopi', 'pink-octopi', 'orange-octopi', 'purple-octopi', 'yellow-octopi', 'red-octopi', 'teal-octopi'];
-  const faceOptions = ['neutral', 'neutral2', 'neutral3', 'neutral4', 'neutral5', 'laugh', 'love', 'pout'];
+  // Memoize sorted players to reduce re-computation
+  const sortedPlayers = useMemo(() => {
+    return [...players].sort((a, b) => {
+      const scoreA = a.getState('score') || 0;
+      const scoreB = b.getState('score') || 0;
+      return scoreB - scoreA;
+    });
+  }, [players]);
+
+  // Throttle leaderboard updates
+  const [throttledSortedPlayers, setThrottledSortedPlayers] = useState(sortedPlayers);
+  
+  useEffect(() => {
+    const now = Date.now();
+    if (now - lastLeaderboardUpdate > 200) { // Update every 200ms
+      setThrottledSortedPlayers(sortedPlayers);
+      setLastLeaderboardUpdate(now);
+    }
+  }, [sortedPlayers, lastLeaderboardUpdate]);
 
   // Initialize Playroom
   useEffect(() => {
@@ -358,12 +379,8 @@ export default function GamePage() {
 
   // In lobby/game - Show 3D scene with Experience managing state
   if (inLobby) {
-    // Get player scores for leaderboard
-    const sortedPlayers = [...players].sort((a, b) => {
-      const scoreA = a.getState('score') || 0;
-      const scoreB = b.getState('score') || 0;
-      return scoreB - scoreA;
-    });
+    // Get player scores for leaderboard (now using throttled data)
+    const myPlayerId = myPlayer()?.id;
 
     // Check if all players are dead
     const allPlayersDead = players.length > 0 && players.every(player => {
@@ -504,13 +521,13 @@ export default function GamePage() {
             {(() => {
               // Show all players when expanded, otherwise show leader + current player
               const myPlayerId = myPlayer()?.id;
-              const myPlayerIndex = sortedPlayers.findIndex(p => p.id === myPlayerId);
+              const myPlayerIndex = throttledSortedPlayers.findIndex(p => p.id === myPlayerId);
               
-              let playersToShow = sortedPlayers;
+              let playersToShow = throttledSortedPlayers;
               if (!leaderboardExpanded) {
                 // Collapsed: show leader and current player only
-                const leader = sortedPlayers[0];
-                const currentPlayer = sortedPlayers.find(p => p.id === myPlayerId);
+                const leader = throttledSortedPlayers[0];
+                const currentPlayer = throttledSortedPlayers.find(p => p.id === myPlayerId);
                 
                 if (leader && currentPlayer && leader.id !== currentPlayer.id) {
                   playersToShow = [leader, currentPlayer];
@@ -522,7 +539,7 @@ export default function GamePage() {
               }
               
               return playersToShow.map((player) => {
-                const playerIdx = sortedPlayers.findIndex(p => p.id === player.id);
+                const playerIdx = throttledSortedPlayers.findIndex(p => p.id === player.id);
                 const score = player.getState('score') || 0;
                 const hp = player.getState('hp') ?? 100;
                 const name = player.getState('name') || `Player ${playerIdx + 1}`;
@@ -573,14 +590,14 @@ export default function GamePage() {
               });
             })()}
           </div>
-          {!leaderboardExpanded && sortedPlayers.length > 2 && (
+          {!leaderboardExpanded && throttledSortedPlayers.length > 2 && (
             <div style={{ 
               textAlign: 'center', 
               color: 'rgba(255,255,255,0.5)', 
               fontSize: '10px', 
               marginTop: '4px' 
             }}>
-              +{sortedPlayers.length - 2} more
+              +{throttledSortedPlayers.length - 2} more
             </div>
           )}
         </div>
@@ -627,7 +644,7 @@ export default function GamePage() {
               </h2>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {sortedPlayers.map((player, idx) => {
+                {throttledSortedPlayers.map((player, idx) => {
                   const score = player.getState('score') || 0;
                   const name = player.getState('name') || `Player ${idx + 1}`;
                   
